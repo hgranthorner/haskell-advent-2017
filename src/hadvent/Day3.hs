@@ -4,7 +4,7 @@ import Control.Monad
 import Control.Monad.State.Lazy
 import Data.Ix
 import Data.List
-import qualified Data.Map.Strict as M
+import qualified Data.Map as M
 import Data.Maybe
 
 import Hadvent.Utils
@@ -35,13 +35,13 @@ type CornerValue = Int
 corners :: [CornerValue]
 corners = scanl (+) 1 stepValues
   where
-    stepValues = [1 ..] >>= take 2 . repeat
+    stepValues = [1 ..] >>= replicate 2
 
 addRotation :: CornerValue -> CornerValue -> Dir -> State Cell [Cell]
 addRotation start end dir = do
   previousCell <- get
   let (val, lastCell) =
-        runState (mapM genNextCell $ range ((succ start), end)) previousCell
+        runState (mapM genNextCell $ range (succ start, end)) previousCell
   put lastCell
   return val
   where
@@ -72,13 +72,13 @@ nextCell c D = c {value = succ $ value c, y = pred $ y c}
 nextCell c R = c {value = succ $ value c, x = succ $ x c}
 
 dirs :: [Dir]
-dirs = (cycle [R, U, L, D])
+dirs = cycle [R, U, L, D]
 
 solveFirst :: Int -> Int
 solveFirst num =
   let grid' = take num grid
       Cell {x = x, y = y} = last grid'
-   in (abs x) + (abs y)
+   in abs x + abs y
 
 type Pos = (Int, Int)
 
@@ -92,7 +92,7 @@ gridMap num = buildMap initialMap initialCell $ take num $ zip3 corners (tail co
     buildMap cm c ((start, end, dir):xs) =
       let (cm', lastCell) =
             addRotationMap cm c start end dir
-       in if (value lastCell) > num
+       in if value lastCell > num
             then cm'
             else buildMap cm' lastCell xs
     initialMap = M.singleton (0, 0) initialCell
@@ -104,14 +104,12 @@ sumOfSurrounding cm (x, y) = sum values
     ys = range (y - 1, y + 1)
     values :: [Int]
     values =
-      map (fromMaybe 0 . fmap value)
-        $ map (\pos -> M.lookup pos cm)
-        $ liftM2 (,) xs ys
+      map (fromMaybe 0 . fmap value . flip M.lookup cm) $ liftM2 (,) xs ys
 
 addRotationMap ::
      CellMap -> Cell -> CornerValue -> CornerValue -> Dir -> (CellMap, Cell)
 addRotationMap currentMap previousCell start end dir =
-        genNextCell (range ((succ start), end)) currentMap previousCell
+        genNextCell (range (succ start, end)) currentMap previousCell
   where
     genNextCell :: [a] -> CellMap -> Cell -> (CellMap, Cell)
     genNextCell [] cm previousCell = (cm, previousCell)
@@ -121,3 +119,6 @@ addRotationMap currentMap previousCell start end dir =
         nextCell'' =
           nextCell' {value = sumOfSurrounding cm (x nextCell', y nextCell')}
         nextMap = M.insert (x nextCell', y nextCell') nextCell'' cm
+
+solveSecond :: Int -> Int
+solveSecond num = minimum $ filter (> num) $ map value $ M.elems $ gridMap num
