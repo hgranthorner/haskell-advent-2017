@@ -59,7 +59,7 @@ library
     import:           warnings
 
     -- Modules exported by the library.
-    exposed-modules:  Hadvent.MyLib, Hadvent.Day1, Hadvent.Day2
+    exposed-modules:  Hadvent.MyLib, Hadvent.Day1, Hadvent.Day2, Hadvent.Day3
 
     -- Modules included in this library but not exported.
     other-modules: Hadvent.Utils
@@ -68,9 +68,10 @@ library
     other-extensions: OverloadedStrings
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.18.0.0,
-                      text ^>=2.0.2,
-                      array ^>=0.5.5
+    build-depends:    base ^>=4.17.0.0,
+                      array ^>=0.5.4,
+                      mtl ^>= 2.2.2,
+                      containers ^>=0.6.7
 
     -- Directories containing source files.
     hs-source-dirs:   src
@@ -102,6 +103,6 @@ test-suite hadvent-test
 
     -- Test dependencies.
     build-depends:
-        base ^>=4.18.0.0,
+        base ^>=4.17.0.0,
         hunit ^>=1.6.2,
         hadvent

@@ -44,3 +44,12 @@ runTests xs = forM_ (zip [(1 :: Int) ..] xs) f
 
 readInt :: String -> Int
 readInt = read
+
+uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
+uncurry3 f = \(x, y, z) -> f x y z
+
+uncurry4 :: (a -> b -> c -> d -> e) -> (a, b, c, d) -> e
+uncurry4 f = \(x, y, z, a) -> f x y z a
+
+alternating :: [Bool]
+alternating = map even [1 ..]
